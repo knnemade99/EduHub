@@ -10,7 +10,7 @@ import com.eduhub.app.entity.UserCredential;
 import com.eduhub.app.service.AuthService;
 import com.eduhub.app.util.Encrypt;
 
-@Service("commonService")
+@Service("authService")
 public class AuthServiceImpl implements AuthService {
 	
 	@Autowired
@@ -20,6 +20,11 @@ public class AuthServiceImpl implements AuthService {
 	public ResponseEntity<?> login(UserCredential logincredentials) {
 		logincredentials.setPassword(Encrypt.encrypt(logincredentials.getPassword()));
 		return authDao.login(logincredentials);
+	}
+
+	@Override
+	public ResponseEntity<?> logout(String authToken) {
+		return authDao.logout(authToken);
 	}
 
 }

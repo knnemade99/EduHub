@@ -7,4 +7,6 @@ import com.eduhub.app.entity.UserCredential;
 
 public interface AuthDao {
 	public ResponseEntity<?> login(UserCredential logincredentials);
+
+	public ResponseEntity<?> logout(String authToken);
 }

@@ -37,7 +37,7 @@ public class User {
 	private Role role;
 	
 	@OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL)
-	@JoinColumn(name="username")
+	@JoinColumn(name="username",unique=true)
 	@NotNull
 	private UserCredential userCredential;
 	

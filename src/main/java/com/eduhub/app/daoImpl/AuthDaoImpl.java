@@ -35,7 +35,6 @@ public class AuthDaoImpl implements AuthDao {
 
 	/* login functionality implementation */
 	@Override
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ResponseEntity<?> login(UserCredential logincredentials) {
 		System.out.println("login implementation called");
 		Session session=sessionFactory.openSession();
@@ -61,6 +60,12 @@ public class AuthDaoImpl implements AuthDao {
 				if(!userResult.isEmpty()){
 					/* generate random pin for authtoken */
 					String randomPIN = (int)(Math.random()*9000)+1000 +"";
+					
+					/*removing old authtoken for user if present*/
+					String deleteAuthTokenHQL = "delete FROM authtable where userId = :userId";
+					Query deleteAuthTokenQuery = session.createQuery(deleteAuthTokenHQL);
+					deleteAuthTokenQuery.setInteger("userId", userResult.get(0).getUserId());
+					deleteAuthTokenQuery.executeUpdate();
 					
 					/*storing authtoken in database*/
 					authTable.setUser(userResult.get(0));
@@ -97,4 +102,55 @@ public class AuthDaoImpl implements AuthDao {
 		}
 	}
 
+	/* logout functionality implementaion */
+	@Override
+	public ResponseEntity<?> logout(String authToken) {
+		System.out.println("logout implementation called");
+		Session session=sessionFactory.openSession();
+		if(checkAuthToken(authToken)!=null){
+			try{
+				session.beginTransaction();
+				
+				/* Deletes all previous entries for the user from autable if Exist*/ 
+				String hql = "delete FROM authtable where authToken= :authToken" ;
+				Query query = session.createQuery(hql);
+				query.setString("authToken", authToken);
+				query.executeUpdate();
+			}
+			catch(Exception e){
+				session.getTransaction().rollback();
+				
+			}finally{
+				Map<String,String> responseMap = new HashMap<String,String>();
+				responseMap.put("message",env.getProperty("message.success"));
+				return ResponseEntity.ok(responseMap);
+			}
+		}
+		else{
+			Map<String,String> responseMap = new HashMap<String,String>();
+			responseMap.put("message",env.getProperty("message.invalidauthtoken"));
+			return new ResponseEntity<Map>(responseMap,HttpStatus.UNAUTHORIZED);
+		}
+	}
+
+	/* check for valid authToken returns user if present for authtoken else returns null */
+	private User checkAuthToken(String authToken){
+		Session session=sessionFactory.openSession();
+		User user = null;
+		boolean validAuth = false;
+		try{
+			session.beginTransaction();
+			AuthTable authTable=session.get(AuthTable.class, authToken);
+			if(authTable!=null){
+				user = authTable.getUser();
+			}
+		}
+		catch(Exception e){
+			session.getTransaction().rollback();
+			user = null;
+		}
+		finally{
+			return user;
+		}
+	}
 }
