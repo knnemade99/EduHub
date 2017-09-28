@@ -17,6 +17,8 @@ import org.springframework.stereotype.Repository;
 import com.eduhub.app.dao.AccountDao;
 import com.eduhub.app.entity.User;
 import com.eduhub.app.entity.UserCredential;
+import com.eduhub.app.util.EmailSender;
+import com.eduhub.app.util.Encrypt;
 
 @Repository("accountDao")
 @PropertySource({ 
@@ -28,6 +30,10 @@ public class AccountDaoImpl implements AccountDao {
 	public SessionFactory sessionFactory;
 	@Autowired
 	private Environment env;
+	@Autowired
+	EmailSender mailService;
+	@Autowired
+	CommonMethods commonMethods;
 
 	/* create account functionality implementation */
 	@Override
@@ -41,13 +47,18 @@ public class AccountDaoImpl implements AccountDao {
 			System.out.println(user);
 			
 			/* check if username already exist or not */
-			if(!checkUsername(user.getUserCredential().getUsername())){
+			if(!commonMethods.checkUsername(user.getUserCredential().getUsername())){
 				/* check if email already exist or not */
-				if(!checkEmail(user.getEmail())){
+				if(!commonMethods.checkEmail(user.getEmail())){
+					user.getUserCredential().setPassword(Encrypt.encrypt(user.getUserCredential().getPassword()));
 					session.save(user.getUserCredential());
 					session.save(user);
 					message=env.getProperty("message.success");
 					status = HttpStatus.CREATED;
+					
+					/*sends Email*/
+					String text = "Hi "+user.getName()+",\nWelcome to the Edudata";
+					mailService.sendEmail(user.getEmail(), "Welcome to Edudata", text);
 				}
 				else{
 					message=env.getProperty("message.emailExist");
@@ -74,56 +85,4 @@ public class AccountDaoImpl implements AccountDao {
 		}
 	}
 	
-	/* Method to check for existing username */
-	private boolean checkUsername(String username){
-		Session session=sessionFactory.openSession();
-		boolean usernameExist = false;
-		try{
-			session.beginTransaction();
-			
-			/*fetching usercredential*/
-			String fetchCredentialHQL = "FROM usercredential where username='"+username+"'";
-			Query fetchCredentialQuery = session.createQuery(fetchCredentialHQL);
-			List<UserCredential> usercredentialResult = fetchCredentialQuery.list();
-			if(usercredentialResult.size()>0)
-				usernameExist = true;
-	
-		}
-		catch(Exception e){
-			session.getTransaction().rollback();
-			usernameExist =false;
-		}
-		finally{
-			session.getTransaction().commit();
-			session.close();
-			return usernameExist;
-		}
-	}
-	
-	/* Method to check for existing email */
-	private boolean checkEmail(String email){
-		Session session=sessionFactory.openSession();
-		boolean emailExist = false;
-		try{
-			session.beginTransaction();
-			
-			/*fetching usercredential*/
-			String fetchCredentialHQL = "FROM user where email='"+email+"'";
-			Query fetchCredentialQuery = session.createQuery(fetchCredentialHQL);
-			List<UserCredential> usercredentialResult = fetchCredentialQuery.list();
-			if(usercredentialResult.size()>0)
-				emailExist = true;
-	
-		}
-		catch(Exception e){
-			session.getTransaction().rollback();
-			emailExist =false;
-		}
-		finally{
-			session.getTransaction().commit();
-			session.close();
-			return emailExist;
-		}
-	}
-
 }

@@ -32,6 +32,8 @@ public class AuthDaoImpl implements AuthDao {
 	public SessionFactory sessionFactory;
 	@Autowired
 	private Environment env;
+	@Autowired
+	CommonMethods commonMethods;
 
 	/* login functionality implementation */
 	@Override
@@ -107,7 +109,7 @@ public class AuthDaoImpl implements AuthDao {
 	public ResponseEntity<?> logout(String authToken) {
 		System.out.println("logout implementation called");
 		Session session=sessionFactory.openSession();
-		if(checkAuthToken(authToken)!=null){
+		if(commonMethods.checkAuthToken(authToken)!=null){
 			try{
 				session.beginTransaction();
 				
@@ -133,24 +135,4 @@ public class AuthDaoImpl implements AuthDao {
 		}
 	}
 
-	/* check for valid authToken returns user if present for authtoken else returns null */
-	private User checkAuthToken(String authToken){
-		Session session=sessionFactory.openSession();
-		User user = null;
-		boolean validAuth = false;
-		try{
-			session.beginTransaction();
-			AuthTable authTable=session.get(AuthTable.class, authToken);
-			if(authTable!=null){
-				user = authTable.getUser();
-			}
-		}
-		catch(Exception e){
-			session.getTransaction().rollback();
-			user = null;
-		}
-		finally{
-			return user;
-		}
-	}
 }
