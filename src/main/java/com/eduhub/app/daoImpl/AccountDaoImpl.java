@@ -84,5 +84,67 @@ public class AccountDaoImpl implements AccountDao {
 			return new ResponseEntity<Map>(responseMap,status);
 		}
 	}
+
+	/* forget password implementation */
+	@Override
+	public ResponseEntity<?> changePassword(String authToken, String oldPassword, String newPassword) {
+		System.out.println("Forget Password Implementation called");
+		Session session=sessionFactory.openSession();
+		String message="";
+		HttpStatus status = HttpStatus.OK;
+		
+		/* check for valid authtoken */
+		User user = commonMethods.checkAuthToken(authToken);
+		if(user!=null){
+			
+			/* check if old Password belongs to same user or not */
+			if(user.getUserCredential().getPassword().equals(Encrypt.encrypt(oldPassword))){
+				try{	
+					session.beginTransaction();
+					
+					/* changing the password */
+					UserCredential usercredential=session.get(UserCredential.class, user.getUserCredential().getUsername());
+					usercredential.setPassword(Encrypt.encrypt(newPassword));
+					
+					/* storing the new password */
+					session.update(usercredential);
+					
+					message=env.getProperty("message.success");
+					status = HttpStatus.OK;
+					
+					/*sends Email*/
+					String text = "Hi "+user.getName()+",\nYour password for EduData changed successfully";
+					mailService.sendEmail(user.getEmail(), "Password Cahnged", text);
+				}
+				catch(Exception e){
+					session.getTransaction().rollback();
+					message=env.getProperty(e.toString());
+					status = HttpStatus.BAD_REQUEST;
+				}
+				finally{
+					session.getTransaction().commit();
+					session.close();
+					
+					Map<String,String> responseMap = new HashMap<String,String>();
+					responseMap.put("message",message);
+					return new ResponseEntity<Map>(responseMap,status);
+				}
+			}
+			else{
+				message=env.getProperty("message.password.incorrect");
+				status = HttpStatus.BAD_REQUEST;
+				Map<String,String> responseMap = new HashMap<String,String>();
+				responseMap.put("message",message);
+				return new ResponseEntity<Map>(responseMap,status);
+			}
+		}
+		else{
+			message=env.getProperty("message.invalidauthtoken");
+			status = HttpStatus.UNAUTHORIZED;
+			Map<String,String> responseMap = new HashMap<String,String>();
+			responseMap.put("message",message);
+			return new ResponseEntity<Map>(responseMap,status);
+		}
+	}
 	
 }

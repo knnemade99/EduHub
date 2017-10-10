@@ -3,6 +3,7 @@ package com.eduhub.app.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -13,6 +14,7 @@ import com.eduhub.app.entity.User;
 import com.eduhub.app.entity.UserCredential;
 import com.eduhub.app.service.AuthService;
 
+@CrossOrigin
 @RestController
 @EnableAutoConfiguration
 @RequestMapping("/auth")

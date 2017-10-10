@@ -19,4 +19,9 @@ public class AccountServiceImpl implements AccountService {
 		return accountDao.createAccount(user);
 	}
 
+	@Override
+	public ResponseEntity<?> changePassword(String authToken, String oldPassword, String newPassword) {
+		return accountDao.changePassword(authToken, oldPassword, newPassword);
+	}
+
 }
