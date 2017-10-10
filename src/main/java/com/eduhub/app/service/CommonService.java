@@ -6,8 +6,8 @@ import com.eduhub.app.entity.User;
 
 public interface CommonService {
 	
-	public ResponseEntity<?> getCategory(String authToken);
+	public ResponseEntity<?> getCategory();
 	
-	public ResponseEntity<?> getStandard(String authToken);
+	public ResponseEntity<?> getStandard();
 	
 }

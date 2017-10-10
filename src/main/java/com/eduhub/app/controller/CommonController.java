@@ -23,12 +23,12 @@ public class CommonController {
 	private CommonService commonService;
 	
 	@GetMapping(value = "/getsubject")
-	public ResponseEntity<?> getCategory(@RequestHeader("AuthToken") String authToken){
-		return commonService.getCategory(authToken);
+	public ResponseEntity<?> getCategory(){
+		return commonService.getCategory();
 	}
 	
 	@GetMapping(value = "/getstandard")
-	public ResponseEntity<?> getStandard(@RequestHeader("AuthToken") String authToken){
-		return commonService.getStandard(authToken);
+	public ResponseEntity<?> getStandard(){
+		return commonService.getStandard();
 	}
 }

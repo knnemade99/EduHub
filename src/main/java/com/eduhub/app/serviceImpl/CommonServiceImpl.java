@@ -15,13 +15,13 @@ public class CommonServiceImpl implements CommonService {
 	private CommonDao commonDao;
 
 	@Override
-	public ResponseEntity<?> getCategory(String authToken) {
-		return commonDao.getCategory(authToken);
+	public ResponseEntity<?> getCategory() {
+		return commonDao.getCategory();
 	}
 	
 	@Override
-	public ResponseEntity<?> getStandard(String authToken) {
-		return commonDao.getStandard(authToken);
+	public ResponseEntity<?> getStandard() {
+		return commonDao.getStandard();
 	}
 
 }

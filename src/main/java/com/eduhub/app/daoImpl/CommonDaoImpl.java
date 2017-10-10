@@ -40,86 +40,62 @@ public class CommonDaoImpl implements CommonDao {
 	
 	/* get Subjects functionality implementation */
 	@Override
-	public ResponseEntity<?> getCategory(String authToken) {
+	public ResponseEntity<?> getCategory() {
 		System.out.println("get subject implementation called");
 		Session session=sessionFactory.openSession();
 		String message="";
 		HttpStatus status = HttpStatus.OK;
 		List<Category> categories = null ;
 		
-		/* check for valid authtoken */
-		User user = commonMethods.checkAuthToken(authToken);
-		if(user!=null){
+		try{	
+			session.beginTransaction();
 			
-			try{	
-				session.beginTransaction();
-				
-				/* get all subjects */
-				categories = session.createCriteria(Category.class).list();
-			}
-			catch(Exception e){
-				session.getTransaction().rollback();
-				message=env.getProperty(e.toString());
-				status = HttpStatus.BAD_REQUEST;
-			}
-			finally{
-				session.getTransaction().commit();
-				session.close();
-				
-				Map<String,Object> responseMap = new HashMap<String,Object>();
-				responseMap.put("message",env.getProperty("message.success"));
-				responseMap.put("data", categories);
-				return new ResponseEntity<Map>(responseMap,status);
-			}
+			/* get all subjects */
+			categories = session.createCriteria(Category.class).list();
 		}
-		else{
-			message=env.getProperty("message.invalidauthtoken");
-			status = HttpStatus.UNAUTHORIZED;
-			Map<String,String> responseMap = new HashMap<String,String>();
-			responseMap.put("message",message);
+		catch(Exception e){
+			session.getTransaction().rollback();
+			message=env.getProperty(e.toString());
+			status = HttpStatus.BAD_REQUEST;
+		}
+		finally{
+			session.getTransaction().commit();
+			session.close();
+			
+			Map<String,Object> responseMap = new HashMap<String,Object>();
+			responseMap.put("message",env.getProperty("message.success"));
+			responseMap.put("data", categories);
 			return new ResponseEntity<Map>(responseMap,status);
 		}
 	}
 	
 	/* get Standards functionality implementation */
 	@Override
-	public ResponseEntity<?> getStandard(String authToken) {
+	public ResponseEntity<?> getStandard() {
 		System.out.println("get standard implementation called");
 		Session session=sessionFactory.openSession();
 		String message="";
 		HttpStatus status = HttpStatus.OK;
 		List<Category> categories = null ;
 		
-		/* check for valid authtoken */
-		User user = commonMethods.checkAuthToken(authToken);
-		if(user!=null){
+		try{	
+			session.beginTransaction();
 			
-			try{	
-				session.beginTransaction();
-				
-				/* get all subjects */
-				categories = session.createCriteria(Standard.class).list();
-			}
-			catch(Exception e){
-				session.getTransaction().rollback();
-				message=env.getProperty(e.toString());
-				status = HttpStatus.BAD_REQUEST;
-			}
-			finally{
-				session.getTransaction().commit();
-				session.close();
-				
-				Map<String,Object> responseMap = new HashMap<String,Object>();
-				responseMap.put("message",env.getProperty("message.success"));
-				responseMap.put("data", categories);
-				return new ResponseEntity<Map>(responseMap,status);
-			}
+			/* get all subjects */
+			categories = session.createCriteria(Standard.class).list();
 		}
-		else{
-			message=env.getProperty("message.invalidauthtoken");
-			status = HttpStatus.UNAUTHORIZED;
-			Map<String,String> responseMap = new HashMap<String,String>();
-			responseMap.put("message",message);
+		catch(Exception e){
+			session.getTransaction().rollback();
+			message=env.getProperty(e.toString());
+			status = HttpStatus.BAD_REQUEST;
+		}
+		finally{
+			session.getTransaction().commit();
+			session.close();
+			
+			Map<String,Object> responseMap = new HashMap<String,Object>();
+			responseMap.put("message",env.getProperty("message.success"));
+			responseMap.put("data", categories);
 			return new ResponseEntity<Map>(responseMap,status);
 		}
 	}
