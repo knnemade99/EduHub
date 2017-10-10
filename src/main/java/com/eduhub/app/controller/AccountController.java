@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,8 +32,13 @@ public class AccountController {
 		return accountService.createAccount(user);
 	}
 	
-	@PostMapping(value = "/changepassword")
+	@PutMapping(value = "/changepassword")
 	public ResponseEntity<?> changePassword(@RequestBody Map<String, String> credential, @RequestHeader("AuthToken") String authToken){
 		return accountService.changePassword(authToken, credential.get("oldPassword"), credential.get("newPassword"));
+	}
+	
+	@PutMapping(value = "/forgetpassword")
+	public ResponseEntity<?> forgetPassword(@RequestBody Map<String, String> requestBody){
+		return accountService.forgetPassword(requestBody.get("email"));
 	}
 }

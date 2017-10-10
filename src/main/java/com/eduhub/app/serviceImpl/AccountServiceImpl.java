@@ -23,5 +23,10 @@ public class AccountServiceImpl implements AccountService {
 	public ResponseEntity<?> changePassword(String authToken, String oldPassword, String newPassword) {
 		return accountDao.changePassword(authToken, oldPassword, newPassword);
 	}
+	
+	@Override
+	public ResponseEntity<?> forgetPassword(String email) {
+		return accountDao.forgetPassword(email);
+	}
 
 }

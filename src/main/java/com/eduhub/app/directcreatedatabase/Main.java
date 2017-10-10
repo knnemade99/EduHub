@@ -20,18 +20,18 @@ import com.eduhub.app.util.Encrypt;
 public class Main {
 	
 	public static void generateStandard(Session session){
-		Standard standard1 = new Standard("1");
-		Standard standard2 = new Standard("2");
-		Standard standard3 = new Standard("3");
-		Standard standard4 = new Standard("4");
-		Standard standard5 = new Standard("5");
-		Standard standard6 = new Standard("6");
-		Standard standard7 = new Standard("7");
-		Standard standard8 = new Standard("8");
-		Standard standard9 = new Standard("9");
-		Standard standard10 = new Standard("10");
-		Standard standard11 = new Standard("11");
-		Standard standard12 = new Standard("12");
+		Standard standard1 = new Standard("First");
+		Standard standard2 = new Standard("Second");
+		Standard standard3 = new Standard("Third");
+		Standard standard4 = new Standard("Fourth");
+		Standard standard5 = new Standard("Fifth");
+		Standard standard6 = new Standard("Sixth");
+		Standard standard7 = new Standard("Seventh");
+		Standard standard8 = new Standard("Eighth");
+		Standard standard9 = new Standard("Ninth");
+		Standard standard10 = new Standard("Tenth");
+		Standard standard11 = new Standard("Eleventh");
+		Standard standard12 = new Standard("Twelfth");
 		session.save(standard1);
 		session.save(standard2);
 		session.save(standard3);

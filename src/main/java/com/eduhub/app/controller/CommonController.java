@@ -22,7 +22,7 @@ public class CommonController {
 	@Autowired
 	private CommonService commonService;
 	
-	@GetMapping(value = "/getsubject")
+	@GetMapping(value = "/getcategory")
 	public ResponseEntity<?> getCategory(){
 		return commonService.getCategory();
 	}

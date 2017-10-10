@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -88,7 +89,7 @@ public class AccountDaoImpl implements AccountDao {
 	/* forget password implementation */
 	@Override
 	public ResponseEntity<?> changePassword(String authToken, String oldPassword, String newPassword) {
-		System.out.println("Forget Password Implementation called");
+		System.out.println("Change Password Implementation called");
 		Session session=sessionFactory.openSession();
 		String message="";
 		HttpStatus status = HttpStatus.OK;
@@ -144,6 +145,65 @@ public class AccountDaoImpl implements AccountDao {
 			Map<String,String> responseMap = new HashMap<String,String>();
 			responseMap.put("message",message);
 			return new ResponseEntity<Map>(responseMap,status);
+		}
+	}
+	
+	/* forget password implementation */
+	@Override
+	public ResponseEntity<?> forgetPassword(String email) {
+		System.out.println("Forget Password Implementation called");
+		Session session=sessionFactory.openSession();
+		String message="";
+		HttpStatus status = HttpStatus.OK;
+		
+		/* check if email registered or not */
+		if(commonMethods.checkEmail(email)){
+			try{	
+				session.beginTransaction();
+				
+				/* get User for Email */
+				String fetchUserHQL = "FROM user where email='"+email+"'";
+				Query fetchUserQuery = session.createQuery(fetchUserHQL);
+				List<User> userResult = fetchUserQuery.list();
+				
+				User user = userResult.get(0);
+				
+				/* generates new password */
+				String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@_$!#";
+				String pwd = RandomStringUtils.random( 15, characters );
+				
+				/* fetching user credential */
+				UserCredential usercredential=session.get(UserCredential.class, user.getUserCredential().getUsername());
+				usercredential.setPassword(Encrypt.encrypt(pwd));
+				
+				/* storing the new password */
+				session.update(usercredential);
+				
+				message=env.getProperty("message.success");
+				status = HttpStatus.OK;
+				
+				/*sends Email*/
+				String text = "Hi "+user.getName()+",\nYour new password is " + pwd;
+				mailService.sendEmail(user.getEmail(), "Password Reset", text);
+			}
+			catch(Exception e){
+				session.getTransaction().rollback();
+				message=env.getProperty(e.toString());
+				status = HttpStatus.BAD_REQUEST;
+			}
+			finally{
+				session.getTransaction().commit();
+				session.close();
+				
+				Map<String,String> responseMap = new HashMap<String,String>();
+				responseMap.put("message",message);
+				return new ResponseEntity<Map>(responseMap,status);
+			}
+		}
+		else{
+			Map<String,String> responseMap = new HashMap<String,String>();
+			responseMap.put("message",env.getProperty("message.email.notExist"));
+			return new ResponseEntity<Map>(responseMap,HttpStatus.NOT_FOUND);
 		}
 	}
 	
